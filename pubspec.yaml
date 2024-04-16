@@ -39,6 +39,10 @@ dependencies:
   floating_bottom_navigation_bar: ^1.5.2
   ionicons: ^0.2.2
   firebase_core: ^2.29.0
+  cloud_firestore: ^4.16.1
+  weather: ^3.1.1
+  image_picker: ^0.8.5
+
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +64,7 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/images/logo.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

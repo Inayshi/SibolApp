@@ -11,7 +11,7 @@ class AiAssistPage extends StatelessWidget {
             Container(
               width: 40, // Adjust width as needed
               height: 40, // Adjust height as needed
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage(
                       'assets/images/logo.png'), // Replace with your logo image
@@ -19,14 +19,20 @@ class AiAssistPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 8), // Add some spacing between logo and title
-            Text('AI Assist'), // Title text
+            const SizedBox(width: 8), // Add some spacing between logo and title
+            Text(
+              'AI Assist',
+              style: TextStyle(
+                fontSize: 20,
+                color: Color(0xFF5EB266), // Custom color with hexadecimal value
+              ),
+            ),
           ],
         ),
         actions: [
           // Exit icon button
           IconButton(
-            icon: Icon(Icons.exit_to_app),
+            icon: const Icon(Icons.exit_to_app),
             onPressed: () {
               // Add navigation logic to exit the page
             },
@@ -45,17 +51,17 @@ class AiAssistPage extends StatelessWidget {
                   fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {},
               child: Text('I need help setting up my farm'),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {},
               child: Text('I need help identifying a plant'),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {},
               child: Text('I need help with taking care of my farm'),
