@@ -3,8 +3,17 @@ import 'components/navbar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'ai_assist.dart';
+import 'components/ai_assist/chatscreen.dart';
+import 'components/ai_assist/farm_setup.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 
-Future<void> main() async {
+void main() async {
+  Gemini.init(
+    apiKey: "AIzaSyDSA6LoguOAxvHSkAwfHPJAuI6f1QsPSCY",
+  );
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensure Flutter binding is initialized
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -23,9 +32,9 @@ class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
 
   final List<Widget> _widgetOptions = [
-    AiAssistPage(), //This is temporary, this should direct to AiAssist.dart
-    Text('Forums'), //This is temporary, this should direct to Forums.dart
-    Text('MyFarm'), //This is temporary, this should direct to MyFarm.dart
+    AIAssist(), //This is temporary, this should direct to AiAssist.dart
+    Text('Forum'), //This is temporary, this should direct to Settings.dart
+    Text('My Farm'), //This is temporary, this should direct to Settings.dart
     Text('Settings'), //This is temporary, this should direct to Settings.dart
   ];
 
@@ -38,6 +47,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(primaryColor: Colors.green, useMaterial3: true),
       home: SafeArea(
         child: Scaffold(
           body: Center(
