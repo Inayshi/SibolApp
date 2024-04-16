@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:urban_farming/core/dialogs.dart';
+import 'package:urban_farming/services/auth_service.dart';
+import 'package:urban_farming/widgets/note_icon_button_outlined.dart';
 
 class AiAssistPage extends StatelessWidget {
   @override
@@ -24,11 +28,15 @@ class AiAssistPage extends StatelessWidget {
           ],
         ),
         actions: [
-          // Exit icon button
-          IconButton(
-            icon: Icon(Icons.exit_to_app),
-            onPressed: () {
-              // Add navigation logic to exit the page
+          NoteIconButtonOutlined(
+            icon: FontAwesomeIcons.rightFromBracket,
+            onPressed: () async {
+              final bool shouldLogout = await showConfirmationDialog(
+                    context: context,
+                    title: 'Do you want to sign out of the app?',
+                  ) ??
+                  false;
+              if (shouldLogout) AuthService.logout();
             },
           ),
         ],
