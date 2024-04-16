@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "410625420632",
+    "project_id": "urban-farming-3efe6",
+    "storage_bucket": "urban-farming-3efe6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:410625420632:android:a2aca44d78e257b944092d",
+        "android_client_info": {
+          "package_name": "com.example.sibol_urban_farming"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCV_KfsNSne6HsWP0Y3FAGQTPs7LEToiik"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:410625420632:android:562debd9efcc8fab44092d",
+        "android_client_info": {
+          "package_name": "com.example.urban_farming"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCV_KfsNSne6HsWP0Y3FAGQTPs7LEToiik"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
