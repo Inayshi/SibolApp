@@ -27,11 +27,24 @@ class _AIAssistState extends State<AIAssist> {
   );
 
   late File? _image = null;
+  late TextEditingController? locationController = TextEditingController();
+  late TextEditingController? concernController = TextEditingController();
 
   bool _showBuildUI = false;
   bool _showQuery1 = false;
   bool _showQuery2 = false;
   bool _showQuery3 = false;
+  late String dropdownValue;
+  late List<String> list;
+
+  @override
+  void dispose() {
+    // Clean up the TextEditingController when the widget is disposed
+    locationController?.dispose();
+    concernController?.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,14 +88,176 @@ class _AIAssistState extends State<AIAssist> {
           ? _buildUI()
           : _showQuery1
               ? _query1()
-              : _introduction(),
+              : _showQuery2
+                  ? _query2()
+                  : _showQuery3
+                      ? _query3()
+                      : _introduction(),
     );
   }
 
-  Widget _query1() {
-    const List<String> list = <String>['One', 'Two', 'Three', 'Four'];
-    String dropdownValue = list.first;
+  void _sendQuery1(String? location, String plants, File? image) {
+    if (location == null ||
+        image == null ||
+        plants == "Choose plant preference") {
+      // Show error modal
+      print(location);
+      print(image);
+      print(plants);
 
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content:
+                Text('Please provide location, plant preference, and image.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      _showBuildUI = true;
+      String guide =
+          "Generate a beginner-friendly guide on setting up a farm based on the provided:\n"
+                  "Location:" +
+              location +
+              "\nPlant Preferences:" +
+              plants +
+              "\nList your suggestions of plants, how to take care of them and how they can be set up based on the image provided.";
+      ChatMessage chatMessage = ChatMessage(
+        user: currentUser,
+        createdAt: DateTime.now(),
+        text: guide,
+        medias: [
+          ChatMedia(
+            url: image.path,
+            fileName: "",
+            type: MediaType.image,
+          )
+        ],
+      );
+      _sendMessage(chatMessage);
+    }
+  }
+
+  void _sendQuery2(String? concern, File? image) {
+    if (concern == null || image == null) {
+      // Show error modal
+      print(concern);
+      print(image);
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content:
+                Text('Please provide location, plant preference, and image.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      _showBuildUI = true;
+      String guide =
+          "I am a beginner in urban farming, I need help with the following problems regarding my plant: \n My main concern about my plant is: " +
+              concern +
+              "\n The image of my plant is provided above.";
+      ChatMessage chatMessage = ChatMessage(
+        user: currentUser,
+        createdAt: DateTime.now(),
+        text: guide,
+        medias: [
+          ChatMedia(
+            url: image.path,
+            fileName: "",
+            type: MediaType.image,
+          )
+        ],
+      );
+      _sendMessage(chatMessage);
+    }
+  }
+
+  void _sendQuery3(File? image) {
+    if (image == null) {
+      // Show error modal
+      print(image);
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content:
+                Text('Please provide location, plant preference, and image.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      _showBuildUI = true;
+      String guide =
+          "Identify the plant on image above and provide a beginner-friendly urban farming guide. Include how to take care of the provided plant, how much sunlight it needs and highlight in bullet points how often it needs to be watered in a week and what kind of soil it needs.";
+      ChatMessage chatMessage = ChatMessage(
+        user: currentUser,
+        createdAt: DateTime.now(),
+        text: guide,
+        medias: [
+          ChatMedia(
+            url: image.path,
+            fileName: "",
+            type: MediaType.image,
+          )
+        ],
+      );
+      _sendMessage(chatMessage);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    list = <String>[
+      'Choose plant preference',
+      'Vegetables',
+      'Herbs',
+      'Fruits',
+      'Flowers',
+      'Succulents',
+      'Trees',
+      'Shrubs',
+      'Cacti',
+    ];
+    dropdownValue =
+        list.first; // Initialize dropdownValue with the first item in the list
+    locationController = TextEditingController();
+    concernController = TextEditingController();
+  }
+
+  Widget _query1() {
     void getImage() async {
       final image = await ImagePicker().pickImage(source: ImageSource.gallery);
       if (image == null) return;
@@ -129,18 +304,19 @@ class _AIAssistState extends State<AIAssist> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
               child: TextField(
+                controller: locationController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  hintText: 'Enter Text',
+                  hintText: 'Enter Location',
                 ),
               ),
             ),
             DropdownMenu<String>(
-              initialSelection: list.first,
+              initialSelection: dropdownValue,
               onSelected: (String? value) {
-                // This is called when the user selects an item.
                 setState(() {
-                  dropdownValue = value!;
+                  dropdownValue =
+                      value!; // Update dropdownValue with the selected value
                 });
               },
               dropdownMenuEntries:
@@ -175,9 +351,210 @@ class _AIAssistState extends State<AIAssist> {
             ),
             ElevatedButton(
               onPressed: () {
+                String? location = locationController?.text;
+
                 setState(() {
-                  _showBuildUI = true;
-                  _sendMessageQuery1("Hi Putangina mo");
+                  _sendQuery1(location, dropdownValue, _image);
+                  locationController!.clear(); // Clear the text field
+                  dropdownValue = list.first;
+                  _image = null;
+                });
+              },
+              child: Text(
+                'Send',
+                style:
+                    TextStyle(color: Colors.white), // Set text color to white
+              ),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    Colors.green), // Set background color to green
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _query3() {
+    void getImage() async {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      final imageTemporary = File(image.path);
+
+      setState(() {
+        this._image = imageTemporary;
+      });
+    }
+
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: 20), // Add padding to the left and right
+              child: Text(
+                'Let’s see what that plant looks like.',
+                style: TextStyle(
+                  fontSize: 39,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+                textAlign: TextAlign.left,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: 20), // Add padding to the left and right
+              child: Text(
+                'Upload an image of the plant you want me to identify.',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Inter',
+                ),
+                textAlign: TextAlign.left,
+              ),
+            ),
+            _image != null
+                ? Image.file(
+                    _image!,
+                    width: 250,
+                    height: 250,
+                    fit: BoxFit.cover,
+                  )
+                : Image.network(
+                    'https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg'),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  getImage();
+                });
+              },
+              child: Text(
+                'Add Image',
+                style:
+                    TextStyle(color: Colors.white), // Set text color to white
+              ),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    Colors.green), // Set background color to green
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _sendQuery3(_image);
+                  _image = null;
+                });
+              },
+              child: Text(
+                'Send',
+                style:
+                    TextStyle(color: Colors.white), // Set text color to white
+              ),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    Colors.green), // Set background color to green
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _query2() {
+    void getImage() async {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      final imageTemporary = File(image.path);
+
+      setState(() {
+        this._image = imageTemporary;
+      });
+    }
+
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: 20), // Add padding to the left and right
+              child: Text(
+                'Let me know how I can help with your farm.',
+                style: TextStyle(
+                  fontSize: 39,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+                textAlign: TextAlign.left,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: 20), // Add padding to the left and right
+              child: Text(
+                'Send me an image of your farm, and describe important details there.',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Inter',
+                ),
+                textAlign: TextAlign.left,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+              child: TextField(
+                controller: concernController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Write your Concern',
+                ),
+              ),
+            ),
+            _image != null
+                ? Image.file(
+                    _image!,
+                    width: 250,
+                    height: 250,
+                    fit: BoxFit.cover,
+                  )
+                : Image.network(
+                    'https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg'),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  getImage();
+                });
+              },
+              child: Text(
+                'Add Image',
+                style:
+                    TextStyle(color: Colors.white), // Set text color to white
+              ),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    Colors.green), // Set background color to green
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                String? concern = concernController?.text;
+
+                setState(() {
+                  _sendQuery2(concern, _image);
+                  concernController!.clear(); // Clear the text field
+                  _image = null;
                 });
               },
               child: Text(
@@ -232,11 +609,11 @@ class _AIAssistState extends State<AIAssist> {
           ElevatedButton(
             onPressed: () {
               setState(() {
-                _showBuildUI = true;
+                _showQuery2 = true;
               });
             },
             child: Text(
-              'I need help identifying a plant',
+              'I need help with taking care of my farm',
               style: TextStyle(color: Colors.white), // Set text color to white
             ),
             style: ButtonStyle(
@@ -248,11 +625,11 @@ class _AIAssistState extends State<AIAssist> {
           ElevatedButton(
             onPressed: () {
               setState(() {
-                _showBuildUI = true;
+                _showQuery3 = true;
               });
             },
             child: Text(
-              'I need help with taking care of my farm',
+              'I need help identifying a plant',
               style: TextStyle(color: Colors.white), // Set text color to white
             ),
             style: ButtonStyle(
@@ -373,8 +750,14 @@ class _AIAssistState extends State<AIAssist> {
                     foregroundColor: MaterialStateProperty.all<Color>(
                         Colors.white), // Set text color to white
                   ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('I need Help Setting up my Farm'),
+                  onPressed: () {
+                    setState(() {
+                      _showBuildUI = false;
+                      _showQuery1 = true;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: const Text('I need help setting up my Farm'),
                 ),
                 ElevatedButton(
                   style: ButtonStyle(
@@ -383,8 +766,14 @@ class _AIAssistState extends State<AIAssist> {
                     foregroundColor: MaterialStateProperty.all<Color>(
                         Colors.white), // Set text color to white
                   ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('I need Help Setting up my Farm'),
+                  onPressed: () {
+                    setState(() {
+                      _showBuildUI = false;
+                      _showQuery2 = true;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: const Text('I need help taking care of my plant'),
                 ),
                 ElevatedButton(
                   style: ButtonStyle(
@@ -393,8 +782,14 @@ class _AIAssistState extends State<AIAssist> {
                     foregroundColor: MaterialStateProperty.all<Color>(
                         Colors.white), // Set text color to white
                   ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('I need Help Setting up my Farm'),
+                  onPressed: () {
+                    setState(() {
+                      _showBuildUI = false;
+                      _showQuery3 = true;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: const Text('I need help identifying a plant'),
                 ),
               ],
             ),
