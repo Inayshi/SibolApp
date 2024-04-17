@@ -37,14 +37,6 @@ class RegistrationController extends ChangeNotifier {
 
   String get lastName => _lastName.trim();
 
-  String _address = '';
-  set address(String value) {
-    _address = value;
-    notifyListeners();
-  }
-
-  String get address => _address.trim();
-
   String _location = '';
   set location(String value) {
     _location = value;
@@ -84,7 +76,6 @@ class RegistrationController extends ChangeNotifier {
         await AuthService.register(
           firstName: firstName,
           lastName: lastName,
-          address: address,
           location: location,
           email: email,
           password: password,
@@ -92,7 +83,6 @@ class RegistrationController extends ChangeNotifier {
         await saveUserDataToFirestore();
         _firstName = '';
         _lastName = '';
-        _address = '';
         _location = '';
         _email = '';
         _password = '';
@@ -101,34 +91,20 @@ class RegistrationController extends ChangeNotifier {
           context: context,
           message: 'Your account has been successfully registered!',
         );
-        // if (!context.mounted) return;
-        // showMessageDialog(
-        //   context: context,
-        //   message:
-        //       'A verification email was sent to the provided email address. Please confirm your email to proceed to the app.',
-        // );
-        // // Reload the user
-        // while (!AuthService.isEmailVerified) {
-        //   await Future.delayed(
-        //     const Duration(seconds: 5),
-        //     () => AuthService.user?.reload(),
-        //   );
-        // }
       } else {
-        // Sign in the user
         await AuthService.login(email: email, password: password);
       }
     } on FirebaseAuthException catch (e) {
       if (!context.mounted) return;
       showMessageDialog(
         context: context,
-        message: authExceptionMapper[e.code] ?? 'An unkown error occurred!',
+        message: authExceptionMapper[e.code] ?? 'An unknown error occurred!',
       );
     } catch (e) {
       if (!context.mounted) return;
       showMessageDialog(
         context: context,
-        message: 'An unkown error occurred!',
+        message: 'An unknown error occurred!',
       );
     } finally {
       isLoading = false;
@@ -143,7 +119,6 @@ class RegistrationController extends ChangeNotifier {
         final userData = {
           'firstName': firstName,
           'lastName': lastName,
-          'address': address,
           'location': location,
         };
 
@@ -151,7 +126,7 @@ class RegistrationController extends ChangeNotifier {
             FirebaseFirestore.instance.collection('users').doc(user.uid);
 
         await userDocRef.set(userData);
-        print('Success saving user data to Firestor');
+        print('Success saving user data to Firestore');
       }
     } catch (e) {
       print('Error saving user data to Firestore: $e');
@@ -167,7 +142,7 @@ class RegistrationController extends ChangeNotifier {
       if (!context.mounted) return;
       showMessageDialog(
         context: context,
-        message: 'An unkown error occurred!',
+        message: 'An unknown error occurred!',
       );
     }
   }
@@ -188,13 +163,13 @@ class RegistrationController extends ChangeNotifier {
       if (!context.mounted) return;
       showMessageDialog(
         context: context,
-        message: authExceptionMapper[e.code] ?? 'An unkown error occurred!',
+        message: authExceptionMapper[e.code] ?? 'An unknown error occurred!',
       );
     } catch (e) {
       if (!context.mounted) return;
       showMessageDialog(
         context: context,
-        message: 'An unkown error occurred!',
+        message: 'An unknown error occurred!',
       );
     } finally {
       isLoading = false;

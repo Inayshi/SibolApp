@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:urban_farming/components/ai_assist/plant_care.dart';
 import 'package:urban_farming/login.dart';
 import 'components/navbar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'ai_assist.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 
 Future<void> main() async {
+  Gemini.init(
+    apiKey: "AIzaSyDSA6LoguOAxvHSkAwfHPJAuI6f1QsPSCY",
+  );
+
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(

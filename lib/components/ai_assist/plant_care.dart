@@ -2,57 +2,44 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class FarmSetupPage extends StatefulWidget {
-  const FarmSetupPage({Key? key}) : super(key: key);
+class PlantCarePage extends StatefulWidget {
+  const PlantCarePage({Key? key}) : super(key: key);
 
   @override
-  _FarmSetupPageState createState() => _FarmSetupPageState();
+  _PlantCarePageState createState() => _PlantCarePageState();
 }
 
-class _FarmSetupPageState extends State<FarmSetupPage> {
+class _PlantCarePageState extends State<PlantCarePage> {
   late File? _image;
-  late TextEditingController locationController;
-  late String dropdownValue;
-  late List<String> plantPreferences;
+  late TextEditingController concernController;
 
   @override
   void initState() {
     super.initState();
-    locationController = TextEditingController();
-    dropdownValue = 'Choose plant preference';
-    plantPreferences = [
-      'Choose plant preference',
-      'Vegetables',
-      'Herbs',
-      'Fruits',
-      'Flowers',
-      'Succulents',
-      'Trees',
-      'Shrubs',
-      'Cacti',
-    ];
+    concernController = TextEditingController();
   }
 
   @override
   void dispose() {
-    locationController.dispose();
+    concernController.dispose();
     super.dispose();
   }
 
-  void _sendQuery1(BuildContext context) {
-    if (_image == null ||
-        locationController.text.isEmpty ||
-        dropdownValue == 'Choose plant preference') {
+  void _sendQuery2(BuildContext context) {
+    // Validate input fields
+    if (_image == null || concernController.text.isEmpty) {
+      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Please provide location, plant preference, and image.'),
+        content: Text('Please provide an image and describe your concern.'),
       ));
     } else {
+      // Navigate to the result page with the provided data
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => Scaffold(
             appBar: AppBar(
-              title: Text('Farm Setup Result'),
+              title: Text('Plant Care Result'),
             ),
             body: Center(
               child: Text('Results will be displayed here'),
@@ -75,7 +62,7 @@ class _FarmSetupPageState extends State<FarmSetupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Farm Setup'),
+        title: Text('Plant Care'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -85,7 +72,7 @@ class _FarmSetupPageState extends State<FarmSetupPage> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'Let’s talk about setting up your urban farm.',
+                'Let me know how I can help with your plant.',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -96,34 +83,19 @@ class _FarmSetupPageState extends State<FarmSetupPage> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'Specify your location, plant preferences, and upload an image of the area for your farm.',
+                'Send me an image of your plant and describe your concern.',
                 style: TextStyle(fontSize: 14),
               ),
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
               child: TextField(
-                controller: locationController,
+                controller: concernController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  hintText: 'Enter Location',
+                  hintText: 'Write your Concern',
                 ),
               ),
-            ),
-            DropdownButton<String>(
-              value: dropdownValue,
-              onChanged: (String? newValue) {
-                setState(() {
-                  dropdownValue = newValue!;
-                });
-              },
-              items: plantPreferences
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
             ),
             _image != null
                 ? Image.file(
@@ -144,7 +116,7 @@ class _FarmSetupPageState extends State<FarmSetupPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                _sendQuery1(context);
+                _sendQuery2(context);
               },
               child: Text('Send'),
             ),

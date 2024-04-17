@@ -16,7 +16,6 @@ class AuthService {
   static Future<void> register({
     required String firstName,
     required String lastName,
-    required String address,
     required String location,
     required String email,
     required String password,

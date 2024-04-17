@@ -1,4 +1,3 @@
-import 'package:urban_farming/model_resource/modal.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 

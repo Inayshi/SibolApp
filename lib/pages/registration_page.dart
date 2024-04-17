@@ -138,23 +138,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                       ),
                                       const SizedBox(height: 20),
                                       NoteFormField(
-                                        controller: addressController,
-                                        labelText: 'Address',
-                                        fillColor: white,
-                                        filled: true,
-                                        textCapitalization:
-                                            TextCapitalization.sentences,
-                                        textInputAction: TextInputAction.next,
-                                        validator: Validator.nameValidator,
-                                        onChanged: (newValue) {
-                                          registrationController.address =
-                                              newValue;
-                                        },
-                                      ),
-                                      const SizedBox(height: 20),
-                                      NoteFormField(
                                         controller: locationController,
-                                        labelText: 'Location',
+                                        labelText:
+                                            'Location of your Urban Farm',
                                         fillColor: white,
                                         filled: true,
                                         textCapitalization:
