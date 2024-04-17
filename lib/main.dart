@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:urban_farming/forum/main_forum.dart';
 import 'package:urban_farming/login.dart';
 import 'components/navbar.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,8 +27,9 @@ class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
 
   final List<Widget> _widgetOptions = [
+    LoginPage(),
     AiAssistPage(), //This is temporary, this should direct to AiAssist.dart
-    Text('Forums'), //This is temporary, this should direct to Forums.dart
+    Text('Forum'), //This is temporary, this should direct to Forum.dart
     Text('MyFarm'), //This is temporary, this should direct to MyFarm.dart
     Text('Settings'), //This is temporary, this should direct to Settings.dart
   ];
@@ -43,7 +45,9 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: SafeArea(
         child: Scaffold(
-          body: _selectedIndex == 0 ? LoginPage() : AiAssistPage(),
+          body: _widgetOptions.elementAt(_selectedIndex) != 0
+              ? LoginPage()
+              : AiAssistPage(),
           bottomNavigationBar: _selectedIndex == 0
               ? null
               : Navbar(
