@@ -1,6 +1,9 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -10,151 +13,217 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final TextEditingController _userMessage = TextEditingController();
+  final Gemini gemini = Gemini.instance;
 
-  static const apiKey = "AIzaSyCkTGCchJsaPIkYf3G9RYcMHIDc1feY9gM";
+  List<ChatMessage> messages = [];
 
-  final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
-
-  final List<Message> _messages = [];
-
-  Future<void> sendMessage() async {
-    final message = _userMessage.text;
-    _userMessage.clear();
-
-    setState(() {
-      // Add user message to the chat
-      _messages
-          .add(Message(isUser: true, message: message, date: DateTime.now()));
-    });
-
-    // Send the user message to the bot and wait for the response
-    final content = [Content.text(message)];
-    final response = await model.generateContent(content);
-    setState(() {
-      // Add bot's response to the chat
-      _messages.add(Message(
-          isUser: false, message: response.text ?? "", date: DateTime.now()));
-    });
-  }
-
+  ChatUser currentUser = ChatUser(id: "0", firstName: "User");
+  ChatUser geminiUser = ChatUser(
+    id: "1",
+    firstName: "Gemini",
+  );
   @override
   Widget build(BuildContext context) {
+    double displayWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Gemini Chat Bot'),
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+      appBar: AppBar(
+        title: Row(
           children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  final message = _messages[index];
-                  return Messages(
-                    isUser: message.isUser,
-                    message: message.message,
-                    date: DateFormat('HH:mm').format(message.date),
-                  );
-                },
+            Container(
+              width: displayWidth * 0.1, // Adjust width based on screen width
+              height: displayWidth * 0.1, // Adjust height based on screen width
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/logo.png'),
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 15),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 15,
-                    child: TextFormField(
-                      controller: _userMessage,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50)),
-                        label: const Text("Enter your message"),
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    padding: const EdgeInsets.all(15),
-                    iconSize: 30,
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.black),
-                      foregroundColor: MaterialStateProperty.all(Colors.white),
-                      shape: MaterialStateProperty.all(
-                        const CircleBorder(),
-                      ),
-                    ),
-                    onPressed: () {
-                      sendMessage();
-                    },
-                    icon: const Icon(Icons.send),
-                  )
-                ],
+            SizedBox(width: 8),
+            Text(
+              'AI Assist',
+              style: TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.bold, // Make font bold
+                fontSize: displayWidth * 0.04,
               ),
-            )
+              // Adjust font size based on screen width
+            ),
           ],
-        ));
-  }
-}
-
-class Messages extends StatelessWidget {
-  final bool isUser;
-  final String message;
-  final String date;
-  const Messages(
-      {super.key,
-      required this.isUser,
-      required this.message,
-      required this.date});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(15),
-      margin: const EdgeInsets.symmetric(vertical: 15).copyWith(
-        left: isUser ? 100 : 10,
-        right: isUser ? 10 : 100,
-      ),
-      decoration: BoxDecoration(
-        color: isUser
-            ? const Color.fromARGB(255, 9, 48, 79)
-            : Colors.grey.shade300,
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(10),
-          bottomLeft: isUser ? const Radius.circular(10) : Radius.zero,
-          topRight: const Radius.circular(10),
-          bottomRight: isUser ? Radius.zero : const Radius.circular(10),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            message,
-            style: TextStyle(color: isUser ? Colors.white : Colors.black),
-          ),
-          Text(
-            date,
-            style: TextStyle(color: isUser ? Colors.white : Colors.black),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: () {
+              // Add navigation logic to exit the page
+            },
           ),
         ],
       ),
+      body: _buildUI(),
     );
   }
-}
 
-class Message {
-  final bool isUser;
-  final String message;
-  final DateTime date;
+  Widget _buildUI() {
+    return DashChat(
+      inputOptions: InputOptions(trailing: [
+        IconButton(
+          onPressed: _showMenu,
+          icon: const Icon(
+            Icons.menu,
+          ),
+        )
+      ]),
+      currentUser: currentUser,
+      onSend: _sendMessage,
+      messages: messages,
+    );
+  }
 
-  Message({
-    required this.isUser,
-    required this.message,
-    required this.date,
-  });
+  void _sendMessage(ChatMessage chatMessage) {
+    setState(() {
+      messages = [chatMessage, ...messages];
+    });
+    try {
+      String question = chatMessage.text;
+      List<Uint8List>? images;
+      if (chatMessage.medias?.isNotEmpty ?? false) {
+        images = [
+          File(chatMessage.medias!.first.url).readAsBytesSync(),
+        ];
+      }
+      gemini
+          .streamGenerateContent(
+        question,
+        images: images,
+      )
+          .listen((event) {
+        ChatMessage? lastMessage = messages.firstOrNull;
+        if (lastMessage != null && lastMessage.user == geminiUser) {
+          lastMessage = messages.removeAt(0);
+          String response = event.content?.parts?.fold(
+                  "", (previous, current) => "$previous ${current.text}") ??
+              "";
+          response = response.replaceAll('*', '');
+          lastMessage.text += response;
+          setState(
+            () {
+              messages = [lastMessage!, ...messages];
+            },
+          );
+        } else {
+          String response = event.content?.parts?.fold(
+                  "", (previous, current) => "$previous ${current.text}") ??
+              "";
+          response = response.replaceAll('*', '');
+
+          ChatMessage message = ChatMessage(
+            user: geminiUser,
+            createdAt: DateTime.now(),
+            text: response,
+          );
+          setState(() {
+            messages = [message, ...messages];
+          });
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void _showMenu() async {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 250,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20), // Adjust the radius value as needed
+              topRight:
+                  Radius.circular(20), // Adjust the radius value as needed
+            ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                      20, 0, 20, 0), // Add padding of 16 pixels around the text
+                  child: Text(
+                    'Hi! How can I help you with your farm?',
+                    textAlign: TextAlign.justify, // Align text to center
+
+                    style: TextStyle(
+                      color: Colors.green, // Set text color to green
+                      fontWeight: FontWeight.bold, // Make text bold
+                      fontSize: 24, // Set font size to 24
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        Colors.green), // Set background color to green
+                    foregroundColor: MaterialStateProperty.all<Color>(
+                        Colors.white), // Set text color to white
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('I need Help Setting up my Farm'),
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        Colors.green), // Set background color to green
+                    foregroundColor: MaterialStateProperty.all<Color>(
+                        Colors.white), // Set text color to white
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('I need Help Setting up my Farm'),
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        Colors.green), // Set background color to green
+                    foregroundColor: MaterialStateProperty.all<Color>(
+                        Colors.white), // Set text color to white
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('I need Help Setting up my Farm'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _sendMediaMessage() async {
+    ImagePicker picker = ImagePicker();
+    XFile? file = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+    if (file != null) {
+      ChatMessage chatMessage = ChatMessage(
+        user: currentUser,
+        createdAt: DateTime.now(),
+        text:
+            "Identify the plant and provide a beginner-friendly urban farming guide. Include how to take care of the provided plant, how much sunlight it needs and highlight in bullet points how often it needs to be watered in a week and what kind of soil it needs.",
+        medias: [
+          ChatMedia(
+            url: file.path,
+            fileName: "",
+            type: MediaType.image,
+          )
+        ],
+      );
+      _sendMessage(chatMessage);
+    }
+  }
 }

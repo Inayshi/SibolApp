@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'components/ai_assist/chatscreen.dart';
 
 class AiAssistPage extends StatelessWidget {
   @override
@@ -43,28 +44,59 @@ class AiAssistPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Text(
-              'Hi there, how I can help you?',
-              style: TextStyle(
-                  fontSize: 50,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
+            const SizedBox(height: 100),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 0),
+              child: Text(
+                'Hi there, how I can help you?',
+                style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 50,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w900),
+                textAlign: TextAlign.center,
+              ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 50),
             ElevatedButton(
               onPressed: () {},
-              child: Text('I need help setting up my farm'),
+              child: Text(
+                'I need help setting up my farm',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                fixedSize: Size(300, 60), 
+              ),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChatScreen()),
+                );
+              },
+              child: Text(
+                'I need help identifying a plant',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                fixedSize: Size(300, 60), 
+              ),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {},
-              child: Text('I need help identifying a plant'),
+              child: Text(
+                'I need help with taking care of my farm',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                fixedSize: Size(300, 60), 
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {},
-              child: Text('I need help with taking care of my farm'),
             ),
           ],
         ),
