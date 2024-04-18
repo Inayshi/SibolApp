@@ -14,33 +14,26 @@ class AiAssistPage extends StatelessWidget {
             Container(
               width: 40, // Adjust width as needed
               height: 40, // Adjust height as needed
-              // decoration: const BoxDecoration(
-              //   image: DecorationImage(
-              //     image: AssetImage(
-              //         'assets/images/sibol.png'), // Replace with your logo image
-              //     fit: BoxFit.contain,
-              //   ),
-              // ),
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                      'assets/images/sibol.png'), // Replace with your logo image
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
             const SizedBox(width: 8), // Add some spacing between logo and title
             Text(
               'AI Assist',
               style: TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 20,
-                color: Color(0xFF5EB266), // Custom color with hexadecimal value
+                color: Color.fromARGB(
+                    255, 23, 90, 25), // Custom color with hexadecimal value
               ),
             ),
           ],
         ),
-        actions: [
-          // Exit icon button
-          IconButton(
-            icon: const Icon(Icons.exit_to_app),
-            onPressed: () {
-              // Add navigation logic to exit the page
-            },
-          ),
-        ],
       ),
       body: Center(
         child: Column(
@@ -52,9 +45,9 @@ class AiAssistPage extends StatelessWidget {
               child: Text(
                 'Hi there, how I can help you?',
                 style: TextStyle(
-                    color: Colors.green,
+                    color: Color.fromARGB(255, 23, 90, 25),
                     fontSize: 50,
-                    fontFamily: 'Inter',
+                    fontFamily: 'Poppins',
                     fontWeight: FontWeight.w900),
                 textAlign: TextAlign.center,
               ),
@@ -70,11 +63,11 @@ class AiAssistPage extends StatelessWidget {
               },
               child: Text(
                 'I need help setting up my farm',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white, fontSize: 18),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                fixedSize: Size(300, 60),
+                fixedSize: Size(350, 60),
               ),
             ),
             const SizedBox(height: 10),
@@ -88,11 +81,11 @@ class AiAssistPage extends StatelessWidget {
               },
               child: Text(
                 'I need help identifying a plant',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white, fontSize: 18),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                fixedSize: Size(300, 60),
+                fixedSize: Size(350, 60),
               ),
             ),
             const SizedBox(height: 10),
@@ -105,12 +98,12 @@ class AiAssistPage extends StatelessWidget {
                 );
               },
               child: Text(
-                'I need help with taking care of my farm',
-                style: TextStyle(color: Colors.white),
+                'I need help with my plant',
+                style: TextStyle(color: Colors.white, fontSize: 18),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                fixedSize: Size(300, 60),
+                fixedSize: Size(350, 60),
               ),
             ),
           ],

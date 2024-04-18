@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:urban_farming/components/ai_assist/plant_care.dart';
+import 'package:urban_farming/components/navbar.dart';
 import 'package:urban_farming/login.dart';
-import 'components/navbar.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:urban_farming/pages/my_farm.dart';
 import 'ai_assist.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   Gemini.init(
@@ -22,21 +22,14 @@ Future<void> main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
-
-  final List<Widget> _widgetOptions = [
-    AiAssistPage(), //This is temporary, this should direct to AiAssist.dart
-    Text('Forums'), //This is temporary, this should direct to Forums.dart
-    Text('MyFarm'), //This is temporary, this should direct to MyFarm.dart
-    Text('Settings'), //This is temporary, this should direct to Settings.dart
-  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -44,20 +37,30 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  Widget _getPage(int index) {
+    switch (index) {
+      case 0:
+        return AiAssistPage();
+      // case 1:
+      //   return Forums();
+      case 2:
+        return MyFarm();
+      default:
+        return Container();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SafeArea(
-        child: Scaffold(
-          body: _selectedIndex == 0 ? LoginPage() : AiAssistPage(),
-          bottomNavigationBar: _selectedIndex == 0
-              ? null
-              : Navbar(
-                  currentIndex: _selectedIndex,
-                  onTabSelected: _onItemTapped,
-                ),
-        ),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: 'Poppins', // Set the default font family to Poppins
       ),
+      home: LoginPage(),
+      routes: {
+        '/login': (context) => LoginPage(),
+      },
     );
   }
 }

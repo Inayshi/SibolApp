@@ -17,19 +17,16 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
-      case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
+      // case TargetPlatform.iOS:
+      //   return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -54,10 +51,36 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyA4qW1ypVdAeytJXkIqapLcUvtRCjEsP7M',
-    appId: '1:410625420632:web:3ce580614ee5b6c244092d',
+    appId: '1:410625420632:web:9263eff607329cdb44092d',
     messagingSenderId: '410625420632',
     projectId: 'urban-farming-3efe6',
     authDomain: 'urban-farming-3efe6.firebaseapp.com',
     storageBucket: 'urban-farming-3efe6.appspot.com',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyCV_KfsNSne6HsWP0Y3FAGQTPs7LEToiik',
+    appId: '1:410625420632:android:a2aca44d78e257b944092d',
+    messagingSenderId: '410625420632',
+    projectId: 'urban-farming-3efe6',
+    storageBucket: 'urban-farming-3efe6.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyAtyuUGIDixKqDfHvUm5UVMKO6j7lqSNyg',
+    appId: '1:410625420632:ios:d592076db25cbe5c44092d',
+    messagingSenderId: '410625420632',
+    projectId: 'urban-farming-3efe6',
+    storageBucket: 'urban-farming-3efe6.appspot.com',
+    iosBundleId: 'com.example.sibolUrbanFarming',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyAtyuUGIDixKqDfHvUm5UVMKO6j7lqSNyg',
+    appId: '1:410625420632:ios:c75bfdb6ae6b1dfe44092d',
+    messagingSenderId: '410625420632',
+    projectId: 'urban-farming-3efe6',
+    storageBucket: 'urban-farming-3efe6.appspot.com',
+    iosBundleId: 'com.example.sibolUrbanFarming.RunnerTests',
   );
 }
